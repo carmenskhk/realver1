@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPad Booking System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 400px;
+            text-align: center;
+        }
+
+        .main-app {
+            display: none;
+            background: #f5f7fa;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            background: #3498db;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            padding: 0.5rem 1rem;
+            width: auto;
+            margin: 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .calendar-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #dadce0;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header button {
+            background: transparent;
+            color: #5f6368;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-header button:hover {
+            background: #f1f3f4;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            color: #3c4043;
+            font-size: 2.5rem;
+            font-weight: 400;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .calendar-day-header {
+            background: #f8f9fa;
+            color: #5f6368;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 1rem;
+            border-right: 1px solid #dadce0;
+            border-bottom: 1px solid #dadce0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: #f8f9fa;
+        }
+
+        .calendar-day:nth-child(7n) {
+            border-right: none;
+        }
+
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            color: #9aa0a6;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.disabled {
+            background: #f8f9fa;
+            color: #9aa0a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .day-number {
+            font-weight: 400;
+            color: #3c4043;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .calendar-day.today .day-number {
+            background: #1a73e8;
+            color: white;
+            font-weight: 500;
+        }
+
+        .calendar-event {
+            background: #1a73e8;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .calendar-event.my-booking {
+            background: #27ae60;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+            width: auto;
+            padding: 0;
+        }
+
+        .current-user {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .delete-booking-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 5px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-booking-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>iPad Booking System</h1>
+            
+            <div class="demo">
+                <strong>Booking Rules:</strong><br>
+                Book for TOMORROW onwards<br>
+                Cannot book for TODAY
+            </div>
+            
+            <div class="error" id="errorMsg">Invalid credentials!</div>
+            
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="loginUser" value="kwp_admin">
+            </div>
+            
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="loginPass" value="KW23800349!">
+            </div>
+            
+            <button onclick="doLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="main-app" id="mainApp">
+        <div class="container">
+            <div class="header">
+                <div>
+                    <h2>iPad Booking System</h2>
+                    <div class="current-user">
+                        Logged in as: <strong id="currentUserName">User</strong>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="manageTeachersBtn" class="logout-btn" onclick="openTeacherManagement()" style="background: #9b59b6; display: none;">Manage Teachers</button>
+                    <button class="logout-btn" onclick="doLogout()">Logout</button>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button onclick="prevMonth()">◀</button>
+                    <h3 id="monthYear">September 2025</h3>
+                    <button onclick="nextMonth()">▶</button>
+                </div>
+                <div class="calendar-grid" id="calendar">
+                    <!-- Calendar generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Management Modal (Admin Only) -->
+    <div id="teacherModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="close-btn" onclick="closeTeacherModal()">&times;</button>
+            
+            <h2>Teacher Management</h2>
+            <div class="current-user">Admin Panel - Manage School Teachers</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 2rem;">
+                <!-- Teacher List -->
+                <div>
+                    <h3 id="teacherCount">All Teachers</h3>
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead style="background: #f8f9fa; position: sticky; top: 0;">
+                                <tr>
+                                    <th style="padding: 0.8rem; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
+                                    <th style="padding: 0.8rem; text-align: left; border-bottom: 1px solid #ddd;">Username</th>
+                                    <th style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #ddd;">Bookings</th>
+                                    <th style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #ddd;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherTableBody">
+                                <!-- Teachers populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Add Teacher Form -->
+                <div>
+                    <h3>Add New Teacher</h3>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+                        <div class="form-group">
+                            <label>Teacher Name:</label>
+                            <input type="text" id="newTeacherName" placeholder="e.g., 張老師">
+                        </div>
+                        <div class="form-group">
+                            <label>Username:</label>
+                            <input type="text" id="newTeacherUsername" placeholder="e.g., kwp_zhang">
+                        </div>
+                        <button onclick="addNewTeacher()" style="background: #27ae60; color: white; width: 100%; padding: 1rem; border: none; border-radius: 5px; cursor: pointer;">Add Teacher</button>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: #e7f3ff; border-radius: 5px; font-size: 0.9rem;">
+                            <strong>Note:</strong> New teachers will use password: <code>KW23800349!</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            
+            <h2 id="modalDate">Book iPad</h2>
+            <div id="userInfo" class="current-user">Booking as: <strong id="modalUser">User</strong></div>
+            
+            <div class="success" id="bookSuccess">Booking successful!</div>
+            
+            <div class="form-group">
+                <label>Lesson Period:</label>
+                <select id="lesson">
+                    <option value="">Select Lesson</option>
+                    <option value="1">Lesson 1</option>
+                    <option value="2">Lesson 2</option>
+                    <option value="3">Lesson 3</option>
+                    <option value="4">Lesson 4</option>
+                    <option value="5">Lesson 5</option>
+                    <option value="6">Lesson 6</option>
+                    <option value="7">Lesson 7</option>
+                    <option value="8">Lesson 8</option>
+                    <option value="9">Lesson 9</option>
+                    <option value="10">Lesson 10</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Number of iPads:</label>
+                <input type="number" id="count" min="1" max="37" placeholder="Enter 1-37 iPads" required>
+                <small style="color: #666; font-size: 0.9rem;">Maximum 37 iPads per booking</small>
+            </div>
+            
+            <div id="availabilityInfo" style="background: #e7f3ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>Availability: </strong><span id="availableCount">120 iPads available</span>
+            </div>
+            
+            <button onclick="makeBooking()">Book iPads</button>
+        </div>
+    </div>
+
+    <script>
+        // Storage utility functions
+        const Storage = {
+            save: function(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    console.error('Failed to save data:', e);
+                    return false;
+                }
+            },
+            
+            load: function(key, defaultValue = null) {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : defaultValue;
+                } catch (e) {
+                    console.error('Failed to load data:', e);
+                    return defaultValue;
+                }
+            },
+            
+            remove: function(key) {
+                try {
+                    localStorage.removeItem(key);
+                    return true;
+                } catch (e) {
+                    console.error('Failed to remove data:', e);
+                    return false;
+                }
+            }
+        };
+
+        // Initialize default teachers with correct names from Excel (A1-A65 and B1-B65)
+        const defaultTeachers = {
+            'kwp_admin': { name: '學校管理員' },
+            'kwp_thwy': { name: '何詠欣' },
+            'kwp_tlsy': { name: '劉倩儀' },
+            'kwp_tnws': { name: '吳慧思' },
+            'kwp_tcpy': { name: '周佩瑩' },
+            'kwp_tttm': { name: '唐紫媚' },
+            'kwp_tynk': { name: '嚴雅健' },
+            'kwp_tpyc': { name: '徐寶頤' },
+            'kwp_tcmc': { name: '朱明智' },
+            'kwp_tlky': { name: '林佳如' },
+            'kwp_tlhc': { name: '林曉晴' },
+            'kwp_tfsma': { name: '樊倩雯' },
+            'kwp_ttky': { name: '湛嘉茵' },
+            'kwp_twyc': { name: '王艷清' },
+            'kwp_tlhm': { name: '羅希敏' },
+            'kwp_tlsm': { name: '羅淑文' },
+            'kwp_tltwk': { name: '羅祉詠' },
+            'kwp_twyk': { name: '胡婉琪' },
+            'kwp_twny': { name: '胡雅賢' },
+            'kwp_tywh': { name: '葉惠卿' },
+            'kwp_typl': { name: '袁佩玲' },
+            'kwp_typs': { name: '袁佩珊' },
+            'kwp_tysk': { name: '袁醒群' },
+            'kwp_thyl': { name: '許綺苓' },
+            'kwp_ttpm': { name: '譚佩敏' },
+            'kwp_ttws': { name: '譚詠珊' },
+            'kwp_tyct': { name: '阮靜甜' },
+            'kwp_tcpk': { name: '陳寶娟' },
+            'kwp_tmwsw': { name: '麥詠詩' },
+            'kwp_twwy': { name: '黃詠欣' },
+            'kwp_twsw': { name: '黃首威' },
+            'kwp_slesson': { name: '林建昇' },
+            'kwp_skay': { name: '蔡冠琪' },
+            'kwp_tlmy': { name: '呂美瑩' },
+            'kwp_tcky': { name: '鍾嘉玉' },
+            'kwp_tronald': { name: '何心洋' },
+            'kwp_matthew': { name: 'Harris Matthew Neil' },
+            'kwp_ttml': { name: '曾美玲' },
+            'kwp_tcsw': { name: '陳淑慧' },
+            'kwp_twwt': { name: '黃允婷' },
+            'kwp_lincoln': { name: '黃境浩' },
+            'kwp_cty': { name: '陳天欣' },
+            'kwp_tlwyj': { name: '謝林維兒' },
+            'kwp_ckl': { name: '周嘉莉老師' },
+            'kwp_lps': { name: '林佩思老師' },
+            'kwp_tyy': { name: '湯茵怡' },
+            'kwp_vincent': { name: '劉俊華' },
+            'kwp_eliot': { name: 'Ames Eliot Ethan' },
+            'kwp_mch': { name: '毛楚希' },
+            'kwp_lyl': { name: '梁玉蓮' },
+            'kwp_gianna': { name: '胡嘉盈' },
+            'kwp_max': { name: '梁浩文' },
+            'kwp_hwp': { name: '何緯邦' },
+            'kwp_kttj': { name: '郭子婷' },
+            'kwp_msn': { name: '麥斯雅' },
+            'kwp_col': { name: '朱安莉' },
+            'kwp_man': { name: '羅健文' },
+            'kwp_yys': { name: '楊銳湘校長' },
+            'TA1': { name: 'TA1' },
+            'TA2': { name: 'TA2' },
+            'TA3': { name: 'TA3' },
+            'TA4': { name: 'TA4' },
+            'TA5': { name: 'TA5' },
+            'TA6': { name: 'TA6' },
+            'TA7': { name: 'TA7' }
+        };
+
+        // Initialize data from storage or defaults
+        let teachers = Storage.load('teachers', defaultTeachers);
+        let bookings = Storage.load('bookings', []);
+
+        // Global state
+        let user = null;
+        let selectedDate = null;
+        let currentDate = new Date(2025, 8, 1); // September 2025
+
+        // Save data to storage
+        function saveData() {
+            Storage.save('teachers', teachers);
+            Storage.save('bookings', bookings);
+        }
+
+        // Secure login function
+        function doLogin() {
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value.trim();
+            
+            // Hide previous error
+            document.getElementById('errorMsg').style.display = 'none';
+            
+            // Validate input
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            // Check credentials
+            if (!teachers[username]) {
+                showError('Username not found');
+                return;
+            }
+            
+            if (password !== 'KW23800349!') {
+                showError('Invalid password');
+                return;
+            }
+            
+            // Create user session
+            user = {
+                id: username,
+                name: teachers[username].name,
+                isAdmin: (username === 'kwp_admin')
+            };
+            
+            console.log('Login successful:', user.name, 'Admin:', user.isAdmin);
+            
+            // Switch to main app
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Set user display
+            const userNameDisplay = user.isAdmin ? `${user.name} (Admin)` : user.name;
+            document.getElementById('currentUserName').textContent = userNameDisplay;
+            
+            // Show admin button for admin users
+            const manageBtn = document.getElementById('manageTeachersBtn');
+            manageBtn.style.display = user.isAdmin ? 'block' : 'none';
+            
+            // Build initial calendar
+            buildCalendar();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Secure logout
+        function doLogout() {
+            user = null;
+            selectedDate = null;
+            
+            // Reset UI
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('bookModal').style.display = 'none';
+            document.getElementById('teacherModal').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('loginUser').value = 'kwp_admin';
+            document.getElementById('loginPass').value = 'KW23800349!';
+        }
+
+        // Calendar navigation
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            buildCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            buildCalendar();
+        }
+
+        // Build calendar with proper null checks
+        function buildCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const today = new Date();
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            
+            document.getElementById('monthYear').textContent = monthNames[month];
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            // Day headers
+            dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+            
+            // Empty cells for days before month starts
+            for (let i = 0; i < startDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day other-month';
+                calendar.appendChild(emptyDay);
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                const dayDate = new Date(year, month, day);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                dayEl.className = 'calendar-day';
+                
+                // Fixed null user check and date validation
+                if (!user) {
+                    // Not logged in - disable all interactions
+                    dayEl.classList.add('disabled');
+                } else if (user.isAdmin === true) {
+                    // Admin can book any day
+                    dayEl.onclick = () => openBooking(dateStr);
+                } else {
+                    // Regular users - tomorrow onwards only
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(0, 0, 0, 0);
+                    
+                    if (dayDate < tomorrow) {
+                        dayEl.classList.add('disabled');
+                    } else {
+                        dayEl.onclick = () => openBooking(dateStr);
+                    }
+                }
+                
+                // Highlight today
+                if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                    dayEl.classList.add('today');
+                }
+                
+                const dayNum = document.createElement('div');
+                dayNum.className = 'day-number';
+                dayNum.textContent = day;
+                dayEl.appendChild(dayNum);
+                
+                // Show bookings for this day
+                const dayBookings = bookings.filter(b => b.date === dateStr);
+                dayBookings.forEach(booking => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.style.display = 'flex';
+                    eventDiv.style.alignItems = 'center';
+                    eventDiv.style.marginBottom = '0.25rem';
+                    
+                    const event = document.createElement('div');
+                    event.className = 'calendar-event';
+                    
+                    // Color coding for different booking types
+                    if (user && booking.userId === user.id) {
+                        event.classList.add('my-booking');
+                    }
+                    if (booking.userId === 'kwp_admin') {
+                        event.style.background = '#9b59b6'; // Purple for admin
+                    }
+                    
+                    event.textContent = `L${booking.lesson}: ${booking.count} iPads - ${booking.name}`;
+                    event.style.flex = '1';
+                    
+                    eventDiv.appendChild(event);
+                    
+                    // Add delete button for admin users
+                    if (user && user.isAdmin === true) {
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-booking-btn';
+                        deleteBtn.textContent = '×';
+                        deleteBtn.title = `Delete booking by ${booking.name}`;
+                        
+                        // Use closure to capture booking data safely
+                        deleteBtn.addEventListener('click', (function(bookingData) {
+                            return function(e) {
+                                e.stopPropagation();
+                                deleteBooking(bookingData);
+                            };
+                        })(booking));
+                        
+                        eventDiv.appendChild(deleteBtn);
+                    }
+                    
+                    dayEl.appendChild(eventDiv);
+                });
+                
+                calendar.appendChild(dayEl);
+            }
+        }
+
+        // Open booking modal with enhanced validation
+        function openBooking(date) {
+            if (!user) {
+                alert('Please login first!');
+                return;
+            }
+            
+            // Validate booking permissions
+            if (user.isAdmin !== true) {
+                const selectedDateObj = new Date(date);
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                
+                if (selectedDateObj < tomorrow) {
+                    alert('You can only book iPads for tomorrow onwards, not for today!');
+                    return;
+                }
+            }
+            
+            selectedDate = date;
+            const dateObj = new Date(date);
+            const userLabel = user.isAdmin === true ? `${user.name} (Admin)` : user.name;
+            
+            document.getElementById('modalDate').textContent = dateObj.toDateString();
+            document.getElementById('modalUser').textContent = userLabel;
+            
+            // Calculate availability
+            const dayBookings = bookings.filter(b => b.date === date);
+            const totalBooked = dayBookings.reduce((sum, booking) => sum + booking.count, 0);
+            const available = 120 - totalBooked;
+            
+            document.getElementById('availableCount').textContent = `${available} iPads available (${totalBooked} already booked)`;
+            
+            // Set max limit based on user type and availability
+            const countInput = document.getElementById('count');
+            if (user.isAdmin === true) {
+                countInput.max = 120; // Admin can override availability
+                countInput.placeholder = 'Enter 1-120 iPads (Admin)';
+            } else {
+                countInput.max = Math.min(37, available);
+                countInput.placeholder = `Enter 1-${Math.min(37, available)} iPads`;
+            }
+            
+            // Show existing bookings
+            updateAvailabilityDisplay(dayBookings, available, totalBooked);
+            
+            // Reset form and show modal
+            document.getElementById('lesson').value = '';
+            document.getElementById('count').value = '';
+            document.getElementById('bookSuccess').style.display = 'none';
+            document.getElementById('bookModal').style.display = 'block';
+        }
+
+        function updateAvailabilityDisplay(dayBookings, available, totalBooked) {
+            let availabilityHTML = `<strong>Availability: </strong><span id="availableCount">${available} iPads available (${totalBooked} already booked)</span>`;
+            
+            if (dayBookings.length > 0) {
+                availabilityHTML += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;"><strong>Current bookings:</strong><br>';
+                dayBookings.forEach(booking => {
+                    const isMyBooking = user && booking.userId === user.id;
+                    const isAdminBooking = booking.userId === 'kwp_admin';
+                    let color = '#1a73e8'; // Default blue
+                    
+                    if (isMyBooking) color = '#27ae60'; // Green for my bookings
+                    if (isAdminBooking) color = '#9b59b6'; // Purple for admin bookings
+                    
+                    availabilityHTML += `<span style="color: ${color};">• ${booking.name}: ${booking.count} iPads (Lesson ${booking.lesson})`;
+                    if (isAdminBooking) availabilityHTML += ' [Admin]';
+                    availabilityHTML += '</span><br>';
+                });
+                availabilityHTML += '</div>';
+            }
+            
+            document.getElementById('availabilityInfo').innerHTML = availabilityHTML;
+        }
+
+        // Close modal and reset
+        function closeModal() {
+            document.getElementById('bookModal').style.display = 'none';
+            document.getElementById('lesson').value = '';
+            document.getElementById('count').value = '';
+            document.getElementById('count').placeholder = 'Enter 1-37 iPads';
+            document.getElementById('bookSuccess').style.display = 'none';
+        }
+
+        // Enhanced booking function with better validation
+        function makeBooking() {
+            if (!user) {
+                alert('Authentication required!');
+                return;
+            }
+            
+            const lesson = document.getElementById('lesson').value;
+            const countInput = document.getElementById('count');
+            const count = parseInt(countInput.value);
+            
+            // Validate inputs
+            if (!lesson) {
+                alert('Please select a lesson period!');
+                return;
+            }
+            
+            if (!count || count < 1) {
+                alert('Please enter a valid number of iPads!');
+                return;
+            }
+            
+            // Check maximum limits
+            const maxAllowed = user.isAdmin === true ? 120 : 37;
+            if (count > maxAllowed) {
+                alert(`Maximum ${maxAllowed} iPads per booking for your account type!`);
+                return;
+            }
+            
+            // Check availability (unless admin override)
+            const dayBookings = bookings.filter(b => b.date === selectedDate);
+            const totalBooked = dayBookings.reduce((sum, booking) => sum + booking.count, 0);
+            const available = 120 - totalBooked;
+            
+            if (user.isAdmin !== true && count > available) {
+                alert(`Insufficient iPads available!\nRequested: ${count}\nAvailable: ${available}`);
+                return;
+            }
+            
+            // Check for duplicate booking (same user, same lesson, same date)
+            const duplicateBooking = dayBookings.find(b => 
+                b.userId === user.id && 
+                b.lesson === lesson
+            );
+            
+            if (duplicateBooking) {
+                alert(`You already have a booking for Lesson ${lesson} on this date!\nExisting booking: ${duplicateBooking.count} iPads`);
+                return;
+            }
+            
+            // Create booking with unique ID for better tracking
+            const newBooking = {
+                id: generateBookingId(),
+                userId: user.id,
+                name: user.name,
+                date: selectedDate,
+                lesson: lesson,
+                count: count,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add booking and save
+            bookings.push(newBooking);
+            saveData();
+            
+            console.log('Booking created:', newBooking);
+            
+            // Show success and update display
+            document.getElementById('bookSuccess').style.display = 'block';
+            buildCalendar();
+            
+            // Auto-close modal after success
+            setTimeout(() => {
+                closeModal();
+            }, 2000);
+        }
+
+        // Generate unique booking ID
+        function generateBookingId() {
+            return 'booking_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Enhanced delete booking with better confirmation
+        function deleteBooking(booking) {
+            if (!user || user.isAdmin !== true) {
+                alert('Access denied! Only administrators can delete bookings.');
+                return;
+            }
+            
+            const confirmMessage = `Confirm Deletion\n\nTeacher: ${booking.name}\nDate: ${booking.date}\nLesson ${booking.lesson}: ${booking.count} iPads\n\nThis action cannot be undone.`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Find and remove booking using unique identifier
+            const index = bookings.findIndex(b => 
+                b.userId === booking.userId && 
+                b.date === booking.date && 
+                b.lesson === booking.lesson &&
+                b.count === booking.count &&
+                b.name === booking.name
+            );
+            
+            if (index !== -1) {
+                const deletedBooking = bookings.splice(index, 1)[0];
+                saveData(); // Save changes
+                buildCalendar(); // Refresh display
+                
+                console.log('Booking deleted:', deletedBooking);
+                alert(`Booking deleted successfully!\n\n${booking.name}'s booking for Lesson ${booking.lesson} has been removed.`);
+            } else {
+                console.error('Booking not found for deletion:', booking);
+                alert('Error: Booking not found! It may have already been deleted.');
+            }
+        }
+
+        // Teacher Management Functions
+        function openTeacherManagement() {
+            if (!user || user.isAdmin !== true) {
+                alert('Access denied! Administrator privileges required.');
+                return;
+            }
+            
+            document.getElementById('teacherModal').style.display = 'block';
+            populateTeacherTable();
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').style.display = 'none';
+            document.getElementById('newTeacherName').value = '';
+            document.getElementById('newTeacherUsername').value = '';
+        }
+
+        function populateTeacherTable() {
+            const tableBody = document.getElementById('teacherTableBody');
+            const teacherCount = Object.keys(teachers).length;
+            
+            document.getElementById('teacherCount').textContent = `All Teachers (${teacherCount} total)`;
+            tableBody.innerHTML = '';
+            
+            Object.keys(teachers).forEach(username => {
+                const teacher = teachers[username];
+                const teacherBookings = bookings.filter(b => b.userId === username).length;
+                
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #eee';
+                
+                const isAdmin = username === 'kwp_admin';
+                const actionButton = isAdmin ? 
+                    '<span style="color: #999;">Admin Account</span>' : 
+                    `<button onclick="deleteTeacher('${username}')" style="background: #e74c3c; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">Delete</button>`;
+                
+                row.innerHTML = `
+                    <td style="padding: 0.8rem;">${teacher.name}</td>
+                    <td style="padding: 0.8rem; font-family: monospace; color: #666;">${username}</td>
+                    <td style="padding: 0.8rem; text-align: center;">${teacherBookings}</td>
+                    <td style="padding: 0.8rem; text-align: center;">${actionButton}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function addNewTeacher() {
+            if (!user || user.isAdmin !== true) {
+                alert('Access denied! Administrator privileges required.');
+                return;
+            }
+            
+            const name = document.getElementById('newTeacherName').value.trim();
+            const username = document.getElementById('newTeacherUsername').value.trim();
+            
+            // Validate inputs
+            if (!name || !username) {
+                alert('Please fill in both Teacher Name and Username!');
+                return;
+            }
+            
+            if (name.length < 2) {
+                alert('Teacher name must be at least 2 characters long!');
+                return;
+            }
+            
+            if (username.length < 3) {
+                alert('Username must be at least 3 characters long!');
+                return;
+            }
+            
+            // Validate username format
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                alert('Username can only contain letters, numbers, and underscores!');
+                return;
+            }
+            
+            if (teachers[username]) {
+                alert('Username already exists! Please choose a different username.');
+                return;
+            }
+            
+            // Add new teacher
+            teachers[username] = {
+                name: name
+            };
+            
+            saveData(); // Save changes
+            
+            alert(`Teacher added successfully!\n\nName: ${name}\nUsername: ${username}\nPassword: KW23800349!\n\nThe teacher can now log in using these credentials.`);
+            
+            // Refresh display and clear form
+            populateTeacherTable();
+            document.getElementById('newTeacherName').value = '';
+            document.getElementById('newTeacherUsername').value = '';
+            
+            console.log('New teacher added:', username, name);
+        }
+
+        function deleteTeacher(username) {
+            if (!user || user.isAdmin !== true) {
+                alert('Access denied! Administrator privileges required.');
+                return;
+            }
+            
+            if (username === 'kwp_admin') {
+                alert('Cannot delete the administrator account!');
+                return;
+            }
+            
+            if (!teachers[username]) {
+                alert('Teacher not found!');
+                return;
+            }
+            
+            const teacher = teachers[username];
+            const teacherBookings = bookings.filter(b => b.userId === username);
+            
+            let confirmMessage = `Confirm Teacher Deletion\n\nTeacher: ${teacher.name}\nUsername: ${username}`;
+            
+            if (teacherBookings.length > 0) {
+                confirmMessage += `\n\nWARNING: This teacher has ${teacherBookings.length} active booking(s)!\nDeleting the teacher will also remove all their bookings.`;
+            }
+            
+            confirmMessage += '\n\nThis action cannot be undone.';
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Delete teacher
+            delete teachers[username];
+            
+            // Remove all their bookings
+            for (let i = bookings.length - 1; i >= 0; i--) {
+                if (bookings[i].userId === username) {
+                    bookings.splice(i, 1);
+                }
+            }
+            
+            saveData(); // Save changes
+            
+            alert(`Teacher deleted successfully!\n\n"${teacher.name}" and all associated bookings have been removed.`);
+            
+            populateTeacherTable();
+            buildCalendar(); // Refresh calendar to remove deleted bookings
+            
+            console.log('Teacher and bookings deleted:', username, teacher.name);
+        }
+
+        // Modal click outside to close
+        window.onclick = function(event) {
+            const bookModal = document.getElementById('bookModal');
+            const teacherModal = document.getElementById('teacherModal');
+            
+            if (event.target === bookModal) {
+                closeModal();
+            }
+            if (event.target === teacherModal) {
+                closeTeacherModal();
+            }
+        };
+
+        // Initialize app on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('iPad Booking System initialized');
+            console.log('Data loaded - Teachers:', Object.keys(teachers).length, 'Bookings:', bookings.length);
+            
+            // Build initial calendar (will show disabled state until login)
+            buildCalendar();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Escape key closes modals
+            if (event.key === 'Escape') {
+                closeModal();
+                closeTeacherModal();
+            }
+            
+            // Enter key submits forms
+            if (event.key === 'Enter') {
+                if (document.getElementById('loginScreen').style.display !== 'none') {
+                    doLogin();
+                } else if (document.getElementById('bookModal').style.display === 'block') {
+                    makeBooking();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
